@@ -1085,6 +1085,136 @@ html[data-theme="dark"] input[type="date"] {
     margin-bottom: 40px;
 }
 
+.list-cell-readonly .cell-value {
+    text-align: right;
+    color: var(--muted);
+}
+
+.list-cell-wrap {
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.label-row,
+.label-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.label-edit-cell ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.label-edit-cell li label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.label-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.label-option input {
+    width: auto;
+    accent-color: var(--accent);
+}
+
+.label-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: var(--label-color, var(--muted));
+    background: color-mix(in srgb, var(--label-color, #8e8e93) 16%, transparent);
+}
+
+.task-sub-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.status-pill,
+.priority-pill,
+.deadline-pill {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--fill);
+    color: var(--text-secondary);
+}
+
+.status-pending {
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.status-done {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 14%, transparent);
+}
+
+.priority-high {
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.priority-medium {
+    color: #ff9500;
+    background: rgba(255, 149, 0, 0.14);
+}
+
+.priority-low {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 14%, transparent);
+}
+
+.deadline-overdue {
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.deadline-today {
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.notes-block {
+    text-align: left;
+    white-space: pre-wrap;
+    line-height: 1.45;
+}
+
+.task-sub {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.task-sub .label-chip {
+    margin-right: 4px;
+}
+
+
 /* Remove heavy shadows from old panels */
 .panel {
     box-shadow: none;

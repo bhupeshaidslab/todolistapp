@@ -3,16 +3,17 @@
 {% block content %}
 <main class="app edit-screen">
     <header class="nav-bar nav-bar-compact">
-        <a class="btn-link back-nav" href="{% url 'task_list' %}">‹ Reminders</a>
-        <button form="editTaskForm" class="btn-link" type="submit">Done</button>
+        <a class="btn-link back-nav" href="{% url 'task_manage' task.pk %}">‹ Manage</a>
+        <button form="editTaskForm" class="btn-link" type="submit">Save</button>
     </header>
 
-    <h1 class="large-title large-title-sm">Details</h1>
+    <h1 class="large-title large-title-sm">Edit task</h1>
+    <p class="subtitle">Update priority, deadline, labels, and status.</p>
 
     <form method="post" id="editTaskForm">
         {% csrf_token %}
 
-        <p class="group-label">Reminder</p>
+        <p class="group-label">Task</p>
         <div class="inset-group">
             <label class="list-cell list-cell-field list-cell-stack">
                 <span class="cell-label">Title</span>
@@ -24,14 +25,14 @@
             </label>
         </div>
 
-        <p class="group-label">Options</p>
+        <p class="group-label">Planning</p>
         <div class="inset-group">
             <label class="list-cell list-cell-field">
                 <span class="cell-label">Priority</span>
                 {{ form.priority }}
             </label>
             <label class="list-cell list-cell-field">
-                <span class="cell-label">Due</span>
+                <span class="cell-label">Deadline</span>
                 {{ form.due_date }}
             </label>
             <label class="list-cell list-cell-field">
@@ -39,12 +40,27 @@
                 {{ form.category }}
             </label>
         </div>
+
+        <p class="group-label">Labels</p>
+        <div class="inset-group">
+            <div class="list-cell list-cell-wrap label-edit-cell">
+                {{ form.labels }}
+            </div>
+        </div>
+
+        <p class="group-label">Status</p>
+        <div class="inset-group">
+            <label class="list-cell list-cell-field">
+                <span class="cell-label">{{ form.completed.label }}</span>
+                {{ form.completed }}
+            </label>
+        </div>
     </form>
 
     <p class="group-footer">
         <form method="post" action="{% url 'task_delete' task.pk %}" onsubmit="return confirmDelete(event)">
             {% csrf_token %}
-            <button class="btn-link danger-text" type="submit">Delete Reminder</button>
+            <button class="btn-link danger-text" type="submit">Delete task</button>
         </form>
     </p>
 </main>

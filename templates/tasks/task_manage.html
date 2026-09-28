@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Manage · {{ task.title }}{% endblock %}
+{% block content %}
+<main class="app edit-screen">
+    <header class="nav-bar nav-bar-compact">
+        <a class="btn-link back-nav" href="{% url 'task_list' %}">‹ Tasks</a>
+        <a class="btn-link" href="{% url 'task_edit' task.pk %}">Edit</a>
+    </header>
+
+    <h1 class="large-title large-title-sm">{{ task.title }}</h1>
+    <p class="subtitle">
+        <span class="status-pill {% if task.completed %}status-done{% else %}status-pending{% endif %}">
+            {% if task.completed %}Completed{% else %}Pending{% endif %}
+        </span>
+    </p>
+
+    <p class="group-label">Manage task</p>
+    <div class="inset-group">
+        <div class="list-cell list-cell-readonly">
+            <span class="cell-label">Priority</span>
+            <span class="cell-value">{{ task.get_priority_display }}</span>
+        </div>
+        <div class="list-cell list-cell-readonly">
+            <span class="cell-label">Deadline</span>
+            <span class="cell-value {% if task.is_overdue %}overdue-text{% endif %}">{{ task.deadline_label }}</span>
+        </div>
+        <div class="list-cell list-cell-readonly">
+            <span class="cell-label">List</span>
+            <span class="cell-value">{{ task.category.name|default:"None" }}</span>
+        </div>
+        {% if task.labels.all %}
+        <div class="list-cell list-cell-readonly list-cell-wrap">
+            <span class="cell-label">Labels</span>
+            <span class="cell-value label-row">
+                {% for label in task.labels.all %}
+                <span class="label-chip" style="--label-color: {{ label.color }}">{{ label.name }}</span>
+                {% endfor %}
+            </span>
+        </div>
+        {% endif %}
+        {% if task.description %}
+        <div class="list-cell list-cell-readonly list-cell-stack">
+            <span class="cell-label">Notes</span>
+            <span class="cell-value notes-block">{{ task.description }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <p class="group-label">Actions</p>
+    <div class="inset-group">
+        {% if task.completed %}
+        <form method="post" action="{% url 'task_mark_pending' task.pk %}">
+            {% csrf_token %}
+            <button class="list-cell list-cell-action" type="submit">Mark as pending</button>
+        </form>
+        {% else %}
+        <form method="post" action="{% url 'task_toggle' task.pk %}">
+            {% csrf_token %}
+            <button class="list-cell list-cell-action" type="submit">Mark completed</button>
+        </form>
+        {% endif %}
+        <a class="list-cell list-cell-action" href="{% url 'task_edit' task.pk %}">Edit details</a>
+        <form method="post" action="{% url 'task_delete' task.pk %}" onsubmit="return confirmDelete(event)">
+            {% csrf_token %}
+            <button class="list-cell list-cell-action danger-text" type="submit">Delete task</button>
+        </form>
+    </div>
+
+    <p class="group-footer">
+        Created {{ task.created_at|date:"M j, Y g:i A" }} · Updated {{ task.updated_at|date:"M j, Y g:i A" }}
+    </p>
+</main>
+{% endblock %}

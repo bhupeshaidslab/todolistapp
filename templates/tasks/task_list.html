@@ -6,7 +6,7 @@
         <div class="nav-brand">
             <div class="nav-mark" aria-hidden="true">✓</div>
             <div>
-                <div class="nav-title">Reminders</div>
+                <div class="nav-title">TaskFlow</div>
                 <div class="nav-sub">{{ request.user.username }}</div>
             </div>
         </div>
@@ -14,7 +14,7 @@
             {% if completed_count %}
             <form method="post" action="{% url 'task_clear_completed' %}" onsubmit="return confirmClearCompleted(event)">
                 {% csrf_token %}
-                <button class="btn-link" type="submit">Clear</button>
+                <button class="btn-link" type="submit">Clear done</button>
             </form>
             {% endif %}
             <button class="icon-btn theme-toggle" type="button" id="themeToggle" aria-label="Toggle appearance">◐</button>
@@ -25,20 +25,20 @@
         </div>
     </header>
 
-    <h1 class="large-title">Today</h1>
+    <h1 class="large-title">Tasks</h1>
     <p class="subtitle">
-        {{ pending_count }} open
-        {% if completed_count %} · {{ completed_count }} completed{% endif %}
-        {% if overdue_count %} · <span class="overdue-text">{{ overdue_count }} overdue</span>{% endif %}
+        {{ pending_count }} pending
+        {% if completed_count %} · {{ completed_count }} done{% endif %}
+        {% if overdue_count %} · <span class="overdue-text">{{ overdue_count }} past deadline</span>{% endif %}
     </p>
 
     <div class="segmented-wrap">
         <div class="segmented" role="tablist" aria-label="Task status">
-            <a href="{% url 'task_list' %}?status=all&q={{ filters.q }}&priority={{ filters.priority }}&category={{ filters.category }}&sort={{ filters.sort }}"
+            <a href="{% url 'task_list' %}?status=all&q={{ filters.q }}&priority={{ filters.priority }}&category={{ filters.category }}&label={{ filters.label }}&sort={{ filters.sort }}"
                class="{% if filters.status == 'all' %}active{% endif %}">All</a>
-            <a href="{% url 'task_list' %}?status=active&q={{ filters.q }}&priority={{ filters.priority }}&category={{ filters.category }}&sort={{ filters.sort }}"
-               class="{% if filters.status == 'active' %}active{% endif %}">Active</a>
-            <a href="{% url 'task_list' %}?status=done&q={{ filters.q }}&priority={{ filters.priority }}&category={{ filters.category }}&sort={{ filters.sort }}"
+            <a href="{% url 'task_list' %}?status=pending&q={{ filters.q }}&priority={{ filters.priority }}&category={{ filters.category }}&label={{ filters.label }}&sort={{ filters.sort }}"
+               class="{% if filters.status == 'pending' %}active{% endif %}">Pending</a>
+            <a href="{% url 'task_list' %}?status=done&q={{ filters.q }}&priority={{ filters.priority }}&category={{ filters.category }}&label={{ filters.label }}&sort={{ filters.sort }}"
                class="{% if filters.status == 'done' %}active{% endif %}">Done</a>
         </div>
     </div>
@@ -49,14 +49,15 @@
             <input type="hidden" name="status" value="{{ filters.status }}">
             <input type="hidden" name="priority" value="{{ filters.priority }}">
             <input type="hidden" name="category" value="{{ filters.category }}">
+            <input type="hidden" name="label" value="{{ filters.label }}">
             <input type="hidden" name="sort" value="{{ filters.sort }}">
             <span class="search-icon" aria-hidden="true">⌕</span>
-            <input name="q" value="{{ filters.q }}" placeholder="Search reminders" autocomplete="off" aria-label="Search">
+            <input name="q" value="{{ filters.q }}" placeholder="Search tasks" autocomplete="off" aria-label="Search">
         </form>
         <button type="button" class="list-cell list-cell-tap" id="filterToggle" aria-expanded="false" aria-controls="filterSheet">
             <span class="cell-label">Filters</span>
             <span class="cell-value">
-                {% if filters.priority or filters.category or filters.sort != "newest" %}Custom{% else %}Default{% endif %}
+                {% if filters.priority or filters.category or filters.label or filters.sort != "newest" %}Custom{% else %}Default{% endif %}
             </span>
             <span class="chevron" aria-hidden="true">›</span>
         </button>
@@ -79,6 +80,16 @@
             </label>
 
             <label class="list-cell list-cell-field">
+                <span class="cell-label">Label</span>
+                <select name="label" aria-label="Label">
+                    <option value="">Any</option>
+                    {% for lb in labels %}
+                    <option value="{{ lb.pk }}" {% if filters.label == lb.pk|stringformat:"s" %}selected{% endif %}>{{ lb.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label class="list-cell list-cell-field">
                 <span class="cell-label">List</span>
                 <select name="category" aria-label="List">
                     <option value="">Any</option>
@@ -93,30 +104,30 @@
                 <select name="sort" aria-label="Sort">
                     <option value="newest" {% if filters.sort == "newest" %}selected{% endif %}>Newest</option>
                     <option value="oldest" {% if filters.sort == "oldest" %}selected{% endif %}>Oldest</option>
-                    <option value="due" {% if filters.sort == "due" %}selected{% endif %}>Due date</option>
+                    <option value="due" {% if filters.sort == "due" %}selected{% endif %}>Deadline</option>
                     <option value="priority" {% if filters.sort == "priority" %}selected{% endif %}>Priority</option>
                 </select>
             </label>
 
             <button class="list-cell list-cell-action" type="submit">Apply</button>
         </form>
-        {% if filters.q or filters.status != "all" or filters.priority or filters.category or filters.sort != "newest" %}
+        {% if filters.q or filters.status != "all" or filters.priority or filters.category or filters.label or filters.sort != "newest" %}
         <p class="group-footer"><a class="btn-link" href="{% url 'task_list' %}">Reset all</a></p>
         {% endif %}
     </div>
 
-    <p class="group-label">New reminder</p>
+    <p class="group-label">Add task</p>
     <form method="post" action="{% url 'task_add' %}" id="addTaskForm">
         {% csrf_token %}
         <div class="inset-group">
             <div class="list-cell quick-add-cell">
                 <span class="check check-static" aria-hidden="true"></span>
-                <input name="title" maxlength="200" required placeholder="New Reminder" autocomplete="off" aria-label="Title">
+                <input name="title" maxlength="200" required placeholder="What needs doing?" autocomplete="off" aria-label="Title">
             </div>
 
             <details class="add-details">
                 <summary class="list-cell list-cell-tap">
-                    <span class="cell-label">Add Details</span>
+                    <span class="cell-label">Priority, deadline, labels</span>
                     <span class="chevron" aria-hidden="true">›</span>
                 </summary>
                 <label class="list-cell list-cell-field">
@@ -132,8 +143,8 @@
                     </select>
                 </label>
                 <label class="list-cell list-cell-field">
-                    <span class="cell-label">Due</span>
-                    <input name="due_date" type="date">
+                    <span class="cell-label">Deadline</span>
+                    <input name="due_date" type="date" aria-label="Deadline">
                 </label>
                 <label class="list-cell list-cell-field">
                     <span class="cell-label">List</span>
@@ -144,57 +155,41 @@
                         {% endfor %}
                     </select>
                 </label>
+                {% if labels %}
+                <div class="list-cell list-cell-wrap">
+                    <span class="cell-label">Labels</span>
+                    <div class="label-picker">
+                        {% for lb in labels %}
+                        <label class="label-option">
+                            <input type="checkbox" name="labels" value="{{ lb.pk }}">
+                            <span class="label-chip" style="--label-color: {{ lb.color }}">{{ lb.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </details>
 
-            <button class="list-cell list-cell-action" type="submit">Add Reminder</button>
+            <button class="list-cell list-cell-action" type="submit">Add task</button>
         </div>
     </form>
 
-    <p class="group-label">My tasks</p>
+    {% for group_name, group_tasks in task_groups %}
+    <p class="group-label">{{ group_name }}</p>
     <div class="inset-group inset-group-list">
-        {% for task in tasks %}
-        <div class="task-swipe {% if task.completed %}done{% endif %} {% if task.is_overdue %}overdue{% endif %}" data-task-id="{{ task.pk }}">
-            <form method="post"
-                  action="{% url 'task_delete' task.pk %}"
-                  class="task-swipe-delete"
-                  onsubmit="return confirmDelete(event)">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
-            <div class="task-swipe-content">
-                <div class="list-cell task-cell">
-                    <form method="post" action="{% url 'task_toggle' task.pk %}" class="task-check-form">
-                        {% csrf_token %}
-                        <button class="check" aria-label="Toggle reminder" type="submit">
-                            {% if task.completed %}✓{% endif %}
-                        </button>
-                    </form>
-                    <a class="task-main" href="{% url 'task_edit' task.pk %}">
-                        <span class="task-title">{{ task.title }}</span>
-                        {% if task.due_date or task.category or task.priority != "medium" or task.description %}
-                        <span class="task-sub">
-                            {% if task.due_date %}
-                                {% if task.is_overdue %}Overdue · {% endif %}{{ task.due_date|date:"M j" }}
-                            {% endif %}
-                            {% if task.due_date and task.category %} · {% endif %}
-                            {% if task.category %}{{ task.category.name }}{% endif %}
-                            {% if task.priority != "medium" %}
-                                {% if task.due_date or task.category %} · {% endif %}{{ task.get_priority_display }}
-                            {% endif %}
-                            {% if task.description %} · {{ task.description|truncatechars:40 }}{% endif %}
-                        </span>
-                        {% endif %}
-                    </a>
-                    <span class="chevron muted-chevron" aria-hidden="true">›</span>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="list-cell empty-cell">
-            <p class="empty-inline">No reminders here.</p>
-        </div>
+        {% for task in group_tasks %}
+        {% include "tasks/_task_row.html" %}
         {% endfor %}
     </div>
-    <p class="group-footer">Swipe left on a reminder to delete.</p>
+    {% empty %}
+    <p class="group-label">My tasks</p>
+    <div class="inset-group inset-group-list">
+        <div class="list-cell empty-cell">
+            <p class="empty-inline">No tasks match. Add one above or change filters.</p>
+        </div>
+    </div>
+    {% endfor %}
+
+    <p class="group-footer">Tap a task to manage · swipe left to delete</p>
 </main>
 {% endblock %}

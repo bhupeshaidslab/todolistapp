@@ -1,0 +1,45 @@
+<div class="task-swipe {% if task.completed %}done{% endif %} {% if task.is_overdue %}overdue{% endif %}" data-task-id="{{ task.pk }}">
+    <form method="post"
+          action="{% url 'task_delete' task.pk %}"
+          class="task-swipe-delete"
+          onsubmit="return confirmDelete(event)">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+    </form>
+    <div class="task-swipe-content">
+        <div class="list-cell task-cell">
+            <form method="post" action="{% url 'task_toggle' task.pk %}" class="task-check-form">
+                {% csrf_token %}
+                <button class="check" aria-label="Toggle task" type="submit">
+                    {% if task.completed %}✓{% endif %}
+                </button>
+            </form>
+            <a class="task-main" href="{% url 'task_manage' task.pk %}">
+                <span class="task-title">{{ task.title }}</span>
+                <span class="task-sub-line">
+                    <span class="status-pill {% if task.completed %}status-done{% else %}status-pending{% endif %}">
+                        {% if task.completed %}Done{% else %}Pending{% endif %}
+                    </span>
+                    <span class="priority-pill priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                    {% if task.due_date %}
+                    <span class="deadline-pill {% if task.is_overdue %}deadline-overdue{% elif task.is_due_today %}deadline-today{% endif %}">
+                        {{ task.deadline_label }}
+                    </span>
+                    {% endif %}
+                </span>
+                {% if task.labels.all or task.category or task.description %}
+                <span class="task-sub">
+                    {% for label in task.labels.all %}
+                    <span class="label-chip" style="--label-color: {{ label.color }}">{{ label.name }}</span>
+                    {% endfor %}
+                    {% if task.category %}
+                    <span class="label-chip" style="--label-color: {{ task.category.color }}">{{ task.category.name }}</span>
+                    {% endif %}
+                    {% if task.description %}{{ task.description|truncatechars:48 }}{% endif %}
+                </span>
+                {% endif %}
+            </a>
+            <span class="chevron muted-chevron" aria-hidden="true">›</span>
+        </div>
+    </div>
+</div>

@@ -56,6 +56,7 @@ function initFilterSheet() {
     if (
         sheet.querySelector('select[name="priority"]')?.value ||
         sheet.querySelector('select[name="category"]')?.value ||
+        sheet.querySelector('select[name="label"]')?.value ||
         sheet.querySelector('select[name="sort"]')?.value !== "newest"
     ) {
         sheet.removeAttribute("hidden");
