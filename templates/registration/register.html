@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Register · TaskFlow{% endblock %}
+{% block content %}
+<div class="auth-layout">
+    <section class="auth-card auth-card-flat">
+        <div class="nav-mark" aria-hidden="true">✓</div>
+        <h1>Create account</h1>
+        <p class="subtitle">Your reminders, synced to this device.</p>
+
+        <form method="post" class="stack inset-form">
+            {% csrf_token %}
+
+            <div class="inset-group">
+                {% for field in form %}
+                <label class="list-cell list-cell-field">
+                    <span class="cell-label">{{ field.label }}</span>
+                    {{ field }}
+                </label>
+                {% if field.errors %}
+                <div class="list-cell">
+                    <span class="field-error">{{ field.errors|striptags }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <button class="list-cell list-cell-action" type="submit">Continue</button>
+        </form>
+
+        <p class="auth-foot">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+    </section>
+</div>
+{% endblock %}

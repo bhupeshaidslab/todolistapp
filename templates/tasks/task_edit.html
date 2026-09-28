@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Edit · TaskFlow{% endblock %}
+{% block content %}
+<main class="app edit-screen">
+    <header class="nav-bar nav-bar-compact">
+        <a class="btn-link back-nav" href="{% url 'task_list' %}">‹ Reminders</a>
+        <button form="editTaskForm" class="btn-link" type="submit">Done</button>
+    </header>
+
+    <h1 class="large-title large-title-sm">Details</h1>
+
+    <form method="post" id="editTaskForm">
+        {% csrf_token %}
+
+        <p class="group-label">Reminder</p>
+        <div class="inset-group">
+            <label class="list-cell list-cell-field list-cell-stack">
+                <span class="cell-label">Title</span>
+                {{ form.title }}
+            </label>
+            <label class="list-cell list-cell-field list-cell-stack">
+                <span class="cell-label">Notes</span>
+                {{ form.description }}
+            </label>
+        </div>
+
+        <p class="group-label">Options</p>
+        <div class="inset-group">
+            <label class="list-cell list-cell-field">
+                <span class="cell-label">Priority</span>
+                {{ form.priority }}
+            </label>
+            <label class="list-cell list-cell-field">
+                <span class="cell-label">Due</span>
+                {{ form.due_date }}
+            </label>
+            <label class="list-cell list-cell-field">
+                <span class="cell-label">List</span>
+                {{ form.category }}
+            </label>
+        </div>
+    </form>
+
+    <p class="group-footer">
+        <form method="post" action="{% url 'task_delete' task.pk %}" onsubmit="return confirmDelete(event)">
+            {% csrf_token %}
+            <button class="btn-link danger-text" type="submit">Delete Reminder</button>
+        </form>
+    </p>
+</main>
+{% endblock %}

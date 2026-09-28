@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Login · TaskFlow{% endblock %}
+{% block content %}
+<div class="auth-layout">
+    <section class="auth-card auth-card-flat">
+        <div class="nav-mark" aria-hidden="true">✓</div>
+        <h1>Welcome back</h1>
+        <p class="subtitle">Sign in to your reminders.</p>
+
+        <form method="post" class="stack inset-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="error-box">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="inset-group">
+                <label class="list-cell list-cell-field">
+                    <span class="cell-label">Username</span>
+                    {{ form.username }}
+                </label>
+                <label class="list-cell list-cell-field">
+                    <span class="cell-label">Password</span>
+                    {{ form.password }}
+                </label>
+            </div>
+
+            <button class="list-cell list-cell-action" type="submit">Sign In</button>
+        </form>
+
+        <p class="auth-foot">No account? <a href="{% url 'register' %}">Create one</a></p>
+    </section>
+</div>
+{% endblock %}
